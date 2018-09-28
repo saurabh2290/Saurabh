@@ -1,7 +1,15 @@
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class Assignment {
 
+    static private FileHandler fileHandler;
+    static private SimpleFormatter simpleFormatter;
+    private final static Logger logger = Logger.getLogger(Assignment.class.getName());
     public static void main(String args[])
         throws InterruptedException {
         TaskFirst one = new TaskFirst("firstTask");
@@ -29,12 +37,26 @@ public class Assignment {
         latch.await();
 
         // Main thread has started
-        System.out.println(Thread.currentThread().getName() +
+        logger.info(Thread.currentThread().getName() +
             " has finished");
+    }
+
+    private void initLogger() {
+        logger.setLevel(Level.ALL);
+        try {
+            fileHandler = new FileHandler("tasks.log");
+            simpleFormatter = new SimpleFormatter();
+            fileHandler.setFormatter(simpleFormatter);
+            logger.addHandler(fileHandler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.info("Yayy! Logger initiated!");
     }
 }
 
 class Tasks extends Thread {
+    private final static Logger logger = Logger.getLogger(Assignment.class.getName());
     private CountDownLatch latch;
     private int delay;
 
@@ -50,7 +72,7 @@ class Tasks extends Thread {
         try {
             Thread.sleep(delay);
             latch.countDown();
-            System.out.println(Thread.currentThread().getName()
+            logger.info(Thread.currentThread().getName()
                 + " finished");
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -60,6 +82,7 @@ class Tasks extends Thread {
 
 class TaskFirst extends Thread {
 
+    private final static Logger logger = Logger.getLogger(Assignment.class.getName());
     public TaskFirst(String name) {
         super(name);
     }
@@ -68,7 +91,7 @@ class TaskFirst extends Thread {
     public void run() {
         try {
             Thread.sleep(200);
-            System.out.println(Thread.currentThread().getName()
+            logger.info(Thread.currentThread().getName()
                 + " finished");
         } catch (InterruptedException e) {
             e.printStackTrace();
